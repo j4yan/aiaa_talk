@@ -1,0 +1,147 @@
+
+\newcommand{\fnc}[1]{\ensuremath{\mathcal{#1}}}
+\newcommand{\vecfnc}[1]{\ensuremath{\boldsymbol{\mathcal{#1}}}} % vector function
+
+% matrices are often math sans serif type
+\newcommand{\mat}[1]{\ensuremath{\mathsf{#1}}}
+
+\newcommand{\mr}[1]{\mathrm{#1}}
+\newcommand{\diff}[0]{\mr{d}}
+\newcommand{\Tr}[0]{^\mr{T}}
+
+% SBP operator matrices
+\renewcommand{\H}[0]{\mat{H}}
+\newcommand{\Hk}[0]{\H_{\kappa}}
+\newcommand{\D}[0]{\mat{D}}
+\newcommand{\Dx}[0]{\mat{D}_{x}}
+\newcommand{\Dy}[0]{\mat{D}_{y}}
+\newcommand{\Dz}[0]{\mat{D}_{z}}
+\newcommand{\Skew}[0]{\mat{S}}
+\newcommand{\Sx}[0]{\Skew_{x}}
+\newcommand{\Sy}[0]{\Skew_{y}}
+\newcommand{\Sz}[0]{\Skew_{z}}
+\newcommand{\Q}[0]{\mat{Q}}
+\newcommand{\Qx}[0]{\mat{Q}_{x}}
+\newcommand{\Qy}[0]{\mat{Q}_{y}}
+\newcommand{\Qz}[0]{\mat{Q}_{z}}
+\newcommand{\E}[0]{\mat{E}}
+\newcommand{\Ex}[0]{\mat{E}_{x}}
+\newcommand{\Ey}[0]{\mat{E}_{y}}
+\newcommand{\Ez}[0]{\mat{E}_{z}}
+\newcommand{\R}[0]{\mat{R}}
+\newcommand{\B}[0]{\mat{B}}
+\newcommand{\Bg}[0]{\mat{B}_{\gamma}}
+\newcommand{\Gk}[0]{\mat{F}_{\kappa}}
+\newcommand{\Gn}[0]{\mat{F}_{\nu}}
+\newcommand{\Cgk}[0]{\mat{C}_{\gamma\kappa}}
+\newcommand{\Cgn}[0]{\mat{C}_{\gamma\nu}}
+%\newcommand{\Lxk}[0]{\bm{l}_{x,\kappa}^{\gamma}}
+%\newcommand{\Lyk}[0]{\bm{l}_{y,\kappa}^{\gamma}}
+%\newcommand{\Lxn}[0]{\bm{l}_{x,\nu}^{\gamma}}
+%\newcommand{\Lyn}[0]{\bm{l}_{y,\nu}^{\gamma}}
+\newcommand{\Sig}[0]{\mat{\Sigma}}
+\newcommand{\Lam}[0]{\mat{\Lambda}}
+\newcommand{\Lamxx}[0]{\Lam_{xx}}
+\newcommand{\Lamxy}[0]{\Lam_{xy}}
+\newcommand{\Lamyx}[0]{\Lam_{yx}}
+\newcommand{\Lamyy}[0]{\Lam_{yy}}
+
+\newcommand{\fpk}{\fnc{P}_{k}}
+\newcommand{\fpm}{\fnc{P}_{m}}
+\newcommand{\pk}{\bm{p}_{k}}
+\newcommand{\pM}{\bm{p}_{m}}
+\newcommand{\dxfpk}{\frac{\partial\fnc{P}_{k}}{\partial x}}
+\newcommand{\dxpk}{\bm{p}_{k}'}
+\newcommand{\nmin}[1]{N^{*}_{#1}}
+\newcommand{\nk}[0]{n_{\kappa}}
+
+\newcommand{\poly}[1]{\mathbb{P}_{#1}}
+\newcommand{\J}[0]{|\mat{J}|^{-1}}
+\newcommand{\N}[0]{|\mat{N}^*|}
+\newcommand{\Nx}[0]{\mat{N}_x}
+\newcommand{\Ny}[0]{\mat{N}_y}
+\newcommand{\Nxg}[0]{\mat{N}_{x,\gamma}}
+\newcommand{\Nyg}[0]{\mat{N}_{y,\gamma}}
+\newcommand{\Rg}[0]{\mat{R}_{\gamma}}
+\newcommand{\Rgk}[0]{\mat{R}_{\gamma\kappa}}
+\newcommand{\Rgn}[0]{\mat{R}_{\gamma\nu}}
+\newcommand{\Dg}[0]{\mat{D}_{\gamma}}
+\newcommand{\Dgk}[0]{\mat{D}_{\gamma\kappa}}
+\newcommand{\Dgn}[0]{\mat{D}_{\gamma\nu}}
+\newcommand{\Ukp}[0]{\bm{u}_\kappa}
+\newcommand{\Vkp}[0]{\bm{v}_\kappa}
+\newcommand{\Unu}[0]{\bm{u}_\nu}
+\newcommand{\Vnu}[0]{\bm{v}_\nu}
+\newcommand{\Wkp}[0]{\bm{w}_\kappa}
+\newcommand{\Wnu}[0]{\bm{w}_\nu}
+\newcommand{\Ugam}[0]{\bm{u}_\gamma}
+\newcommand{\W}[0]{\bm{w}}
+%\newcommand{\Gk}{\Gamma_\kappa}
+\newcommand{\SumAll}{\sum_{\Omega_\kappa \in \fnc{T}_h}}
+\newcommand{\M}[0]{\mat{M}}
+\newcommand{\Mk}[0]{\mat{M}_{\kappa}}
+
+\newcommand{\Uh}{\bm{u}_{h}}
+\newcommand{\Vh}{\bm{v}_{h}}
+\newcommand{\Ug}{\bm{u}_{\gamma}}
+\newcommand{\Vg}{\bm{v}_{\gamma}}
+\newcommand{\Siggk}[1]{\Sig_{\gamma\kappa}^{(#1)}}
+\newcommand{\Siggn}[1]{\Sig_{\gamma\nu}   ^{(#1)}}
+\newcommand{\Siggam}[1]{\Sig_{\gamma}^{(#1)}}
+\newcommand{\phnt}[1]{\phantom{#1}}
+
+\newcommand{\LL}{\llbracket}
+\newcommand{\RR}{\rrbracket}
+
+% optimization commands
+\newcommand{\Lag}[0]{\fnc{L}}
+\newcommand{\optmin}{\ensuremath{\text{minimize}}}
+\newcommand{\wrt}{\ensuremath{\text{with respect to}}}
+\newcommand{\st}[0]{\ensuremath{\text{s.t.}}}
+%\newcommand{\W}[0]{\mat{W}} % Hessian
+\newcommand{\A}[0]{\mat{A}} % Jacobian
+%\newcommand{\K}[0]{\mat{K}} % KKT matrix
+\newcommand{\Hess}[0]{\mat{H}} % upper Hessenberg
+\newcommand{\I}[0]{\mat{I}} % identity
+
+% common math operators
+\DeclareMathOperator{\spn}{span}
+\DeclareMathOperator{\range}{range}
+\DeclareMathOperator{\mydiag}{diag}
+\newcommand{\argmin}[0]{\ensuremath{\operatornamewithlimits{argmin}}}
+\newcommand{\sgn}[0]{\operatorname{sgn}}
+\newcommand{\nullsp}[0]{\operatorname{null}}
+
+% environments for definitions, therorems, etc 
+%\newtheorem{definition}{Definition}
+%\newtheorem{proposition}{Proposition}
+%\newtheorem{corollary}{Corollary}
+%\newtheorem{lemma}{Lemma}
+%\newtheorem{remark}{Remark}
+\newtheorem{assumption}{Assumption}
+\newtheorem{thrm}{Theorem}
+
+% command latin phrases and other short-forms
+\newcommand{\etal}[0]{{\em et~al.\@}\xspace}
+\newcommand{\eg}[0]{{e.g.\@}\xspace}
+\newcommand{\ie}[0]{{i.e.\@}\xspace}
+\newcommand{\etc}[0]{{etc.\@}\xspace}
+\newcommand{\viz}[0]{{viz.\@}\xspace}
+\newcommand{\resp}[0]{{resp.\@}\xspace}
+
+\newcommand{\highlight}[1]{%
+    \colorbox{red!50}{$\displaystyle#1$}
+}
+
+\newenvironment<>{varblock}[2][.9\textwidth]{%
+    \setlength{\textwidth}{#1}
+    \begin{actionenv}#3%
+        \def\insertblocktitle{#2}%
+        \par%
+        \usebeamertemplate{block begin}
+    }
+        {\par%
+        \usebeamertemplate{block end}%
+    \end{actionenv}
+}
+

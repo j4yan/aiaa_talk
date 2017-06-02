@@ -1,0 +1,663 @@
+\documentclass{beamer}
+
+\mode<presentation> {
+%    \usetheme{Madrid}
+%    \usetheme{Warsaw}
+%    \usetheme{Berlin}
+    \usetheme{CambridgeUS}
+}
+
+%\usepackage{cite}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{xspace}
+\usepackage{afterpage}
+%\usepackage{color}
+%\usepackage[dvipsnames,table,xcdraw]{xcolor}
+\usepackage{stmaryrd}
+\usepackage{textcomp}
+\usepackage{natbib}
+\usepackage{multicol}
+\usepackage{xcolor}
+%\usepackage[mathb]{mathabx}
+\usepackage[absolute,overlay]{textpos}
+
+% hyperref must be last
+\usepackage{hyperref}
+\hypersetup{
+%    backref=true,
+%    colorlinks=true,
+%    linkcolor=blue,
+%    citecolor=blue,
+%    urlcolor=blue
+}
+\setbeamercolor{frametitle}{bg=gray!15}
+\setbeamertemplate{caption}[numbered]
+\setbeamercolor{block body}{bg=gray!20!white}
+
+
+% Update footline template to have a 1:2:1 ratio in the boxes
+\setbeamertemplate{footline}{%
+    \leavevmode%
+    \hbox{%
+        \begin{beamercolorbox}[wd=.25\paperwidth,ht=2.5ex,dp=1.125ex, left]{author in head/foot}%
+            \usebeamerfont{author in head/foot}\hspace*{3ex}\insertshortauthor
+        \end{beamercolorbox}%
+        \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.5ex,dp=1.125ex,center]{title in head/foot}%
+            \usebeamerfont{title in head/foot}\insertshorttitle
+        \end{beamercolorbox}%
+        \begin{beamercolorbox}[wd=.25\paperwidth,ht=2.5ex,dp=1.125ex,right]{title in head/foot}%
+            \usebeamerfont{date in head/foot}\insertshortdate{}
+            \insertframenumber{} / \inserttotalframenumber\hspace*{4ex} 
+        \end{beamercolorbox}
+    }%
+    \vskip0pt%
+}
+
+% input file that defines new command
+\input{newcommand}
+
+
+
+\title[Interior Penalties for SBP Discretizations of 2nd PDEs]{Interior Penalties for Summation-by-Parts Discretizations of Linear Second-Order Differential Equations}
+\author[Yan \textit{et al}]{Jianfeng Yan, Jared Crean, and Jason E. Hicken}
+\institute[]{\normalsize Dept. of MANE, RPI}
+\date[]
+{\today}
+
+
+\AtBeginSection[]{
+    \begin{frame}<beamer>
+         \tableofcontents[currentsection,hideallsubsections]
+%         \tableofcontents[currentsection,hideothersubsections]
+    \end{frame}
+}
+\setbeamerfont{section in toc}{size=\normalsize}
+\setbeamerfont{subsection in toc}{size=\small}
+
+%
+% Start the document
+%
+\begin{document}
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{SBP operators}
+    Summation-by-parts (SBP) operators are high-order finite difference methods that:
+    \begin{itemize}
+        \item mimic integration by parts
+        \item have compact stencil support
+        \item do not depend on exact integration
+        \item have no explicit basis and test functions
+        \item facilitate construction of entropy-stable discretizations of Euler and Navier-Stokes equations
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    Classical SBP operators are based on tensor products of 1D operators, and are limited to structured grids. Multidimensional SBP operators were recently introduced for arbitrary bounded domains\cite{Hicken2016SIAM}.
+    \vskip 10mm
+    \centering
+    \includegraphics[width=0.75\textwidth]{./figures/generalize_tensor.pdf}
+\end{frame}
+
+\begin{frame}{Interior penalties for 2nd derivatives}
+    Since the solution is "$C^{-1}$" continuous, simultaneous 
+    approximation terms (SATs) are necessary to couple elements weakly, and 
+    \begin{itemize}
+        \item stabilize the discretization the penalties should be \\ neither too large nor too small in magnitude\cite{Arnold2002}
+        \item obtain adjoint consistency \\
+        obtain adjoint consistency gives $O(h^{p+1})$ in $L^2$-norm for solution, and $O(h^{2p})$ for functionals\cite{hartmann:2007b}
+        \item are referred as interior penalties in the FE community.
+    \end{itemize}
+    \vskip 5mm
+    The purpose of this work is to address SATs for multidimensional SBP.
+\end{frame}
+
+\begin{frame}{Overview}
+    \tableofcontents[hideallsubsections]
+\end{frame}
+
+\section{Model PDE and discretizations}
+
+\begin{frame}
+    \begin{definition}{}
+        \textbf{SBP operators:} Consider an element $\kappa \subset \mathbb{R}^2$. The matrix $D_x$ is a degree $p$ SBP approximation to the first derivative $\frac{\partial}{\partial x}$ if 
+        \begin{itemize}
+            \item $\forall \fnc{P} \in \poly{p}(\Omega_{\kappa})$, $\Dx\pk = \partial \fnc{P}/\partial x |_{\kappa}$;
+            \item $\Dx = \H^{-1}\Qx$, where $\H$ is symmetric positive-definite;
+            \item $\Qx = \Sx + \frac{1}{2}\Ex$, where $\Sx^T=-\Sx$, $\Ex^T=\Ex$, and
+            $\Ex$ satisfies
+            \begin{equation*}
+            \bm{p}^T\Ex\bm{q} =\displaystyle\oint_{\partial{\kappa}} \fnc{P} \fnc{Q} n_{x}
+            \mr{d}\Gamma,
+            \qquad\forall\; \fnc{P}, \fnc{Q} \in \poly{r}({\kappa}).
+            \end{equation*}
+        \end{itemize}
+    \end{definition}
+\end{frame}
+
+\begin{frame} {Face operators}
+    We also introduce $\Rgk \in \mathbb{R}^{n_\gamma \times n_\kappa}$, a degree $r \le p$ interpolation/extrapolation operator which satisfies
+    \begin{equation*}
+    \left(\Rgk \pk\right)_{j} = 
+    \sum_{i=1}^{\nk} (\Rgk)_{ji} \fnc{P}(x_{i},y_{i}) 
+    = \fnc{P}(x_{j},y_{j}),
+    \qquad\forall j=1,2,\ldots,n_{\gamma}.
+    \end{equation*}
+    then we can find SBP operators with 
+    \begin{equation*}
+    \Ex = \sum_{\gamma \subset \partial \kappa} \Rgk^{T} \Nxg \Bg \Rgk,
+    \end{equation*}
+    Thus
+    \begin{equation*}
+    \bm{p}^T \Ex \bm{q} = \sum_{\gamma \in \partial\kappa} \bm{p}^T \Rgk^T\Nxg\B_{\gamma}\Rgk\bm{q} = \int_{\kappa}\fnc{P}\fnc{Q} n_x\diff \Gamma
+    \end{equation*}
+\end{frame}
+
+\begin{frame}{The model PDE}
+    We consider the following linear parabolic PDE:
+    \begin{equation*}\label{eq:parabolic}
+    \begin{aligned}
+    \frac{\partial \fnc{U}}{\partial{t}}- \nabla\cdot\left( \Lambda \nabla \fnc{U} \right) &= \fnc{F},\quad &&\text{in} \quad\Omega, \\
+    \fnc{U}(0,x,y)&=\fnc{U}_{0}(x,y), \quad &&\text{in} \quad\Omega, \\
+    \fnc{U}(t,x,y) &= \fnc{U}_\fnc{D}(t,x,y) &&\text{on} \quad\Gamma^\fnc{D}, \\
+    \hat{\bm{n}} \cdot \left( \Lambda \nabla \fnc{U}(t,x,y)\right) &= \fnc{U}_\fnc{N}(t,x,y)
+    &&\text{on} \quad \Gamma^\fnc{N}. \\
+    \end{aligned}
+    \end{equation*}
+    where
+    \begin{equation*}
+    \Lambda = \begin{bmatrix}
+    \lambda_{xx} & \lambda_{xy} \\ \lambda_{yx} & \lambda_{yy}
+    \end{bmatrix}
+    \end{equation*}
+    is SPD.
+\end{frame}
+
+\begin{frame}{Strong-form discretization (1/3)}
+    \begin{equation*}
+    {\color{red}\frac{\partial \fnc{U}}{\partial{t}}}- {\color{blue}\nabla\cdot\left( \Lambda \nabla \fnc{U} \right)} = {\color{purple}\fnc{F}},\quad \text{in} \quad\Omega
+    \end{equation*}
+    \vskip 5mm
+The strong-form SBP-SAT discretization on element $\kappa$ is given by
+\begin{equation*}
+{\color{red}\frac{\diff \bm{u}_{\kappa}}{\diff t}} = {\color{blue}\D_\kappa\bm{u}_{\kappa}} + {\color{purple}\bm{f}_\kappa }
+-\Hk^{-1}\bm{s}_{\kappa}^{\fnc{I}}\left(\bm{u}_{h}\right) 
+-\Hk^{-1}\bm{s}_{\kappa}^{\fnc{B}}\left(\bm{u}_{h}, \bm{u}_\fnc{D}, \bm{u}_\fnc{N}\right),
+\end{equation*}
+where 
+\begin{equation*}
+\D_\kappa = \left\{ \begin{bmatrix} \Dx & \Dy \end{bmatrix}
+\begin{bmatrix} \Lamxx & \Lamxy \\ \Lamyx & \Lamyy \end{bmatrix}
+\begin{bmatrix} \Dx \\ \Dy \end{bmatrix} \right\}_{\kappa},
+\end{equation*}
+and 
+$\bm{s}^{\fnc{I}}_{\kappa}$ and $\bm{s}^{\fnc{B}}_{\kappa}$ are interior penalty and boundary penalty, respectively.   
+\end{frame}
+
+\begin{frame}{Strong form discretization (2/3)}
+    \begin{equation*}
+    \bm{s}_{\kappa}^{\fnc{I}}\left(\bm{u}_{h}\right)
+    = \sum_{\gamma \subset \Gamma_\kappa^\fnc{I}}
+    \begin{bmatrix} \Rgk^T & \Dgk^T \end{bmatrix}
+    \setlength{\arraycolsep}{7pt}
+    {\color{blue}\begin{bmatrix} \Siggk{1} & \Siggk{3} \\ \Siggk{2} & \Siggk{4} \end{bmatrix}}
+    {\color{red}\begin{bmatrix} \Rgk\Ukp - \Rgn\Unu \\ \Dgk\Ukp + \Dgn\Unu \end{bmatrix} }
+    \end{equation*}
+    and
+    \begin{equation*}
+    \begin{aligned}
+    \bm{s}_{\kappa}^{\fnc{B}}\left(\bm{u}_{h}, \bm{u}_\fnc{D}, \bm{u}_\fnc{N}\right)
+    =& \sum_{\gamma \subset \Gamma_\kappa^{\fnc{D}}}
+    \begin{bmatrix} \Rgk^T & \Dgk^T \end{bmatrix}
+    \begin{bmatrix} \phnt{-}\Sig_{\gamma}^{\fnc{D}} \\ -\Bg \end{bmatrix}
+    (\Rgk \Ukp -\bm{u}_{\gamma {\fnc{D}}}) \\
+    +& \sum_{\gamma \subset \Gamma_\kappa^{\fnc{N}}} \Rgk^{T}\B_{\gamma} (\Dgk \Ukp - \bm{u}_{\gamma {\fnc{N}}})
+    \end{aligned}
+    \end{equation*}
+    The interior penalty $\bm{s}^{\fnc{I}}_{\kappa}$ is analogous to
+    \begin{equation*}
+    \int_{\gamma} 
+    \begin{bmatrix} \llbracket\fnc{V} \rrbracket \\ \llbracket \bm{n}\cdot \nabla\fnc{V}\rrbracket \end{bmatrix}^T
+    {\color{blue}\begin{bmatrix}
+    \sigma_1 && \sigma_2 \\ \sigma_3 && \sigma_4
+    \end{bmatrix}}
+    {\color{red}\begin{bmatrix}
+     \llbracket\fnc{V} \rrbracket \\ 
+     \llbracket \bm{n}\cdot \nabla\fnc{V}\rrbracket
+    \end{bmatrix}} \diff \Gamma
+    \end{equation*}
+\end{frame}
+
+\begin{frame}{Strong form discretization (3/3)}
+    Assumptions on penalty matrices:
+    \begin{itemize}
+        \item $\Sig_{\gamma\kappa}^{(i)}$, $\Sig_{\gamma}^{\fnc{D}} \in \mathbb{R}^{n_\gamma\times n_\gamma}$, are \textbf{dense};
+        \item \textbf{symmetric}, $\Sig_{\gamma\kappa}^{(i)} = (\Sig_{\gamma\kappa}^{(i)})^T$;
+        \item $\Sig_{\gamma\kappa}^{(i)} \ne \Sig_{\gamma\nu}^{(i)}$ in general.
+    \end{itemize}
+\vskip 5mm
+Our objective is to determine these matrices.
+\end{frame}
+
+\section{Adjoint analysis}
+\begin{frame}{Functional and adjoint (1/3)}
+    An adjoint is defined by the primal PDE and a particular functional of interest. We consider the linear functional
+    \begin{equation*}
+    \fnc{J}(\fnc{U}) = {\color{red}\int_{\Omega} \fnc{G} \fnc{U} \, \diff \Omega}
+    +  {\color{blue}\int_{\Gamma^\fnc{N}} \fnc{V}_\fnc{N} \fnc{U} \, \diff\Gamma }
+    -  {\color{purple}\int_{\Gamma^\fnc{D}} \fnc{V}_\fnc{D} \hat{\bm{n}} \cdot \left(\Lambda \nabla \fnc{U} \right) \, \diff\Gamma} ,
+    \end{equation*}
+    and its SBP discretization
+    \begin{equation*}
+    \begin{aligned}
+    J_h(\bm{u}_h) :=& {\color{red}\sum_{\kappa \in \fnc{T}_{h}}\bm{g}_{\kappa}^T\Hk\Ukp}
+    + {\color{blue}\sum_{\gamma \subset \Gamma^{\fnc{N}}} \bm{v}_{\gamma \fnc{N}}^T\Bg\Rgk\Ukp}
+    - {\color{purple}\sum_{\gamma \subset \Gamma^{\fnc{D}}} \bm{v}_{\gamma \fnc{D}}^T\Bg\Dgk\Ukp} \\
+    +& \sum_{\gamma \subset \Gamma^{\fnc{D}}} \bm{v}_{\gamma \fnc{D}}^T\Sig_{\gamma}^{\fnc{D}} (\Rgk\Ukp - \bm{u}_{\gamma \fnc{D}})
+    \end{aligned}
+    \end{equation*}
+\end{frame}
+\begin{frame}{Functional and adjoint (2/3)}
+    Both the continuous adjoint equation and discrete adjoint equation can be found by $\frac{\partial L}{\partial \delta u} = 0$.
+    \begin{itemize}
+        \item Continous adjoint equation:
+        \begin{equation*}
+        \begin{aligned}
+        -&\nabla\cdot\left(\Lambda \nabla\fnc{V} \right) = \fnc{G},\quad &&\forall \; x \in \Omega, \\
+        &\fnc{V} = \fnc{V}_\fnc{D}, \quad &&\forall \; x \in \Gamma^\fnc{D},  \\
+        &\hat{\bm{n}} \cdot \left( \Lambda \nabla \fnc{V}\right) = \fnc{V}_\fnc{N},
+        &&\forall \; x \in \Gamma^\fnc{N}.
+        \end{aligned}
+        \end{equation*}
+        \item Discrete adjoint equation:
+        \begin{equation*}\label{eq:adjoint_SBP}
+        \D_{\kappa} \Vkp + \bm{g}_{\kappa}
+        - \Hk^{-1} (\bm{s}_{\kappa}^{\fnc{I}})^{*}(\bm{v}_h)
+        - \Hk^{-1} (\bm{s}_{\kappa}^{\fnc{B}})^{*}(\bm{v}_h,\bm{v}_\fnc{D},\bm{v}_\fnc{N})
+        = \bm{0}.
+        \end{equation*}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Functional and adjoint (3/3)}
+    \footnotesize
+    \begin{equation*} \label{ad_interface_sat}
+    (\bm{s}_{\kappa}^{\fnc{I}})^{*}\left(\bm{v}_{h}\right)
+    = \sum_{\gamma \subset \Gamma_\kappa^\fnc{I}}
+    \begin{bmatrix} \Rgk^T & \Dgk^T \end{bmatrix}
+    \setlength{\arraycolsep}{7pt}
+    \setlength{\arraycolsep}{5pt}
+    \begin{bmatrix}
+    \phnt{-}\Siggk{1}       & -\Siggn{1}      & \Siggk{2} + \Bg & -\Siggn{2} \\
+    \Siggk{3} - \Bg & \phnt{-}\Siggn{3}       & \phnt{-}\Siggk{4}       & \phnt{-}\Siggn{4}
+    \end{bmatrix}
+    \begin{bmatrix} \Rgk \Vkp \\ \Rgn \Vnu \\ \Dgk \Vkp \\ \Dgn \Vnu \end{bmatrix} 
+    \end{equation*}
+    \normalsize
+    and the penalties for the boundaries are
+    \footnotesize
+    \begin{equation*}
+    \begin{aligned}
+    (\bm{s}_{\kappa}^{\fnc{B}})^{*}\left(\bm{v}_{h}, \bm{v}_\fnc{D}, \bm{v}_\fnc{N}\right)
+    =& \sum_{\gamma \subset \Gamma_\kappa^{\fnc{D}}}
+    \begin{bmatrix} \Rgk^T & \Dgk^T \end{bmatrix}
+    \begin{bmatrix} \phnt{-}\Sig_{\gamma}^{\fnc{D}} \\ -\Bg \end{bmatrix}
+    (\Rgk \Vkp - \bm{v}_{\gamma\fnc{D}}) \\
+    +& \sum_{\gamma \subset \Gamma_\kappa^{\fnc{N}}} \Rgk^{T}\B_{\gamma} (\Dgk \Vkp - \bm{v}_{\gamma\fnc{N}}).
+    \end{aligned}
+    \end{equation*} 
+\end{frame}
+
+\begin{frame}{Adjoint consistency}
+    Adjoint consistency requires that the discrete adjoint equation is consistent with the continuous adjoint equation. By this definition, we get the conditions for adjoint consistency
+    \begin{block}{}
+        \begin{equation*}
+        \begin{aligned}
+        \Siggk{1} &= \Siggn{1}, &\qquad  
+        \Siggk{2} + \Siggn{2} &= -\B_{\gamma}, \\
+        \Siggk{3} + \Siggn{3} &= \B_{\gamma}, &\qquad
+        \Siggk{4} &= \Siggn{4}.
+        \end{aligned}
+        \end{equation*}
+    \end{block}
+
+\vskip 5mm
+It is straightforward to show the above conditions also give a locally \textbf{conservative} discretization.
+
+\end{frame}
+
+\section{Energy analysis}
+\subsection{Energy of PDE}
+\begin{frame} {Energy of homogeneous problem}
+    The solution of the homogeneous PDE, $\fnc{W}$, satisfies
+    \begin{equation*}
+    \frac{1}{2} \frac{\diff}{\diff t} \int_{\Omega} \fnc{W}^{2} \, \diff \Omega
+    = - \int_{\Omega} \left(\nabla \fnc{W}\right) \cdot \Lambda \left(\nabla \fnc{W} \right) \, \diff \Omega
+    \le 0.
+    \end{equation*}
+    We want the discrete energy to mimic this property.
+\end{frame}
+\subsection{Stability conditions}
+\begin{frame} {Stability conditions (1/3)}
+    With the assumption
+    \begin{equation*}
+    \Siggk{3} - \Siggk{2} = \Bg,
+    \end{equation*}
+    we get
+    \small
+    \begin{equation*}
+    \begin{aligned}
+     &\sum_{\kappa\in \fnc{T}_h}\Ukp^T \Hk \frac{\diff \Ukp}{\diff t} = \\
+    -& \sum_{\gamma \subset \Gamma^{\fnc{I}}}
+    {\color{red}\begin{bmatrix} \Rgk \Vkp \\ \Rgn \Vnu \\ \Gk \Vkp \\ \Gn \Vnu
+    \end{bmatrix}^{T}} 
+    \setlength{\arraycolsep}{5pt}
+    \begin{bmatrix} 
+    \phnt{-}\Siggam{1} & -\Siggam{1} & \phnt{-}\Siggk{2} \Cgk & -\Siggn{2}\Cgn \\
+    -\Siggam{1} & \phnt{-}\Siggam{1} & -\Siggk{2}\Cgk & \phnt{-}\Siggn{2}\Cgn \\
+    \phnt{-}\Cgk^T\Siggk{2} & -\Cgk^{T}\Siggk{2} & \alpha_{\gamma \kappa}\Lam_{\kappa}^{*} &  \\
+    -\Cgn^T\Siggn{2} & \phnt{-}\Cgn^{T}\Siggn{2} &  & \alpha_{\gamma \nu} \Lam_{\nu}^{*}   
+    \end{bmatrix}
+    \begin{bmatrix} \Rgk \Ukp \\ \Rgn \Unu \\ \Gk \Ukp \\ \Gn \Unu
+    \end{bmatrix} \\
+    -& \sum_{\gamma \subset \Gamma^{\fnc{I}}}
+    \begin{bmatrix} \Dgk \Vkp \\ \Dgn \Vnu \end{bmatrix}^T
+    \begin{bmatrix} \Siggam{4} & \Siggam{4} \\ \Siggam{4} & \Siggam{4} \end{bmatrix}
+    \begin{bmatrix} \Dgk \Ukp \\ \Dgn \Unu \end{bmatrix} \\
+    -& \sum_{\gamma \subset \Gamma^{\fnc{D}}}
+    \begin{bmatrix} \Rgk \Vkp \\ \Gk \Vkp \end{bmatrix}^{T}
+    \setlength{\arraycolsep}{5pt}
+    \begin{bmatrix} \phnt{-}\Sig_{\gamma}^{\fnc{D}} & -\Bg \Cgk \\
+    -\Cgk^T \Bg & \alpha_{\gamma \kappa}\Lam_{\kappa}^{*} \end{bmatrix}
+    \begin{bmatrix} \Rgk \Ukp \\ \Gk \Ukp \end{bmatrix},
+    \end{aligned}
+    \end{equation*}
+    \footnotesize
+    \begin{textblock}{5.55}(10.5,4.5)
+        \textblockcolor{gray!30}
+%        \centering
+        $\int 
+        {\color{red}\begin{bmatrix}
+            u^+ \\ u^- \\ (\Lambda\nabla u)^+ \\ (\Lambda\nabla u)^-
+        \end{bmatrix}^T}
+        K\begin{bmatrix}
+            u^+ \\ u^- \\ (\Lambda\nabla u)^+ \\ (\Lambda\nabla u)^-
+        \end{bmatrix} 
+        \diff \Gamma $
+    \end{textblock}
+
+\end{frame}
+
+\begin{frame}{Stability conditions(2/3)}
+    where
+    \begin{equation*}
+    \alpha_{\gamma\kappa} \ge 0 \qquad and \qquad \sum_{\gamma\subset \Gamma_{\kappa}} \alpha_{\gamma\kappa} = 1,
+    \end{equation*}
+    \begin{alignat*}{2}
+    \Gk &= \left\{ \begin{bmatrix} \Lamxx & \Lamxy \\ \Lamyx &
+    \Lamyy \end{bmatrix} \begin{bmatrix} \Dx \\ \Dy \end{bmatrix} \right\}_{\kappa},
+    &
+    \setlength{\arraycolsep}{5pt}    
+    \Cgk &= \begin{bmatrix} \Nxg \Rgk & \Nyg \Rgk \end{bmatrix}, \\
+    \Gn &= \left\{ \begin{bmatrix} \Lamxx & \Lamxy \\ \Lamyx &
+    \Lamyy \end{bmatrix} \begin{bmatrix} \Dx \\ \Dy \end{bmatrix} \right\}_{\nu},
+    & 
+    \setlength{\arraycolsep}{5pt}
+    \Cgn &= - \begin{bmatrix} \Nxg \Rgn & \Nyg \Rgn \end{bmatrix}, \\
+    \intertext{and}
+    \Lam_{\kappa}^{*} &= \left\{ 
+    \begin{bmatrix} \Lamxx & \Lamxy \\ \Lamyx & \Lamyy \end{bmatrix}^{-1}
+    \begin{bmatrix} \H & \\ & \H \end{bmatrix} \right\}_{\kappa}, 
+    & \qquad
+    \Lam_{\nu}^{*} &= \left\{ 
+    \begin{bmatrix} \Lamxx & \Lamxy \\ \Lamyx & \Lamyy \end{bmatrix}^{-1}
+    \begin{bmatrix} \H & \\ & \H \end{bmatrix} \right\}_{\nu}
+    \end{alignat*}
+\end{frame}
+
+\begin{frame}{Stability conditions (3/3)}
+    Schur complement theory: \\
+    \vskip 3mm
+    \centering
+    If $X = \begin{bmatrix}
+    A & B \\ B^T & C
+    \end{bmatrix}$, then $X\succeq 0 \iff \begin{cases}
+    C \succeq 0 \\
+    A-BC^gB^T\succeq 0 \\
+    (I - CC^g)B^T=0
+    \end{cases}$
+    \vskip 5mm
+    \begin{block}{}
+        The homogeneouos problem is energy stable provided
+       \begin{gather*}
+       \Siggam{1} \succeq \Siggk{2} \Cgk
+       \left(\alpha_{\gamma\kappa}\Lam_{\kappa}^{*}\right)^{-1}\Cgk^T \Siggk{2}
+       + \Siggn{2} \Cgn \left(\alpha_{\gamma\nu} \Lam_{\nu}^{*}\right)^{-1}\Cgn^T \Siggn{2}, \\
+       \Sig_{\gamma}^{\fnc{D}} \succeq \Bg \Cgk
+       \left(\alpha_{\gamma\kappa}\Lam_{\kappa}^{*}\right)^{-1}\Cgk^T \Bg ,\\
+       \Sig_{\gamma}^{(4)} \succeq 0.
+       \end{gather*}
+    \end{block}
+\end{frame}
+
+\section{Generalizations of BR2 and SIPG}
+\begin{frame}{Generalization of BR2 and SIPG (1/2)}
+    A simple and effective choice is
+    \footnotesize
+    \begin{equation*}
+    \Siggk{3} = -\Siggk{2} = \frac{1}{2}\Bg, \qquad
+    \Siggk{4} = \Siggn{4} = 0,
+    \end{equation*}
+    \normalsize
+    This choice allows us to generalize BR2\cite{Bassi2005} and SIPG\cite{hartmann:2007b}:
+    \begin{itemize}
+        \item SBP-BR2:
+        \footnotesize
+        \begin{gather*}
+        \Siggam{1} = \frac{1}{4}\Bg \Cgk
+        \left(\alpha_{\gamma\kappa}\Lam_{\kappa}^{*}\right)^{-1}\Cgk^T \Bg
+        + \frac{1}{4}\Bg \Cgn \left(\alpha_{\gamma\nu} \Lam_{\nu}^{*}\right)^{-1}\Cgn^T \Bg \\
+        \Sig_{\gamma}^{\fnc{D}} = \Bg \Cgk
+        \left(\alpha_{\gamma\kappa}\Lam_{\kappa}^{*}\right)^{-1}\Cgk^T \Bg \\
+        \end{gather*}
+        \normalsize
+        \item SPB-SIPG
+        \footnotesize
+        \begin{equation*} 
+        \Siggam{1} = \delta_{\gamma}^{(1)} \Bg,
+        \qquad\text{and}\qquad
+        \Sig_{\gamma}^{\fnc{D}} = \delta_{\gamma}^{\fnc{D}} \Bg,
+        \end{equation*}
+        \normalsize
+        where 
+        \footnotesize
+        \begin{align*}
+        \delta_{\gamma}^{(1)} &= \frac{(\lambda_{\max})_\kappa 
+            \| \Bg^{\frac{1}{2}} \Rgk \Hk^{-\frac{1}{2}} \|_{2}^{2}}%
+        {4 \alpha_{\gamma\kappa}} 
+        + \frac{(\lambda_{\max})_\nu 
+            \| \Bg^{\frac{1}{2}} \Rgn \H_{\nu}^{-\frac{1}{2}} \|_{2}^{2}}%
+        {4 \alpha_{\gamma\nu}}, \\ 
+        \delta_{\gamma}^\fnc{D} &= \frac{(\lambda_{\max})_\kappa 
+            \| \Bg^{\frac{1}{2}} \Rgk \Hk^{-\frac{1}{2}} \|_{2}^{2}}%
+        {\alpha_{\gamma\kappa}} .
+        \end{align*}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \begin{itemize}
+        \item To the best of our knowledge, this is the first time the SBP generalization of BR2 has been presented.
+        \item Our analysis shows how SIPG is related to BR2 using straightforward matrix analysis.
+        \item The SBP-SIPG penalty parameters are similar to those given by Shahbazi\cite{Shahbazi2005explicit}, but more general, because they are applicable to spatially varying tensor diffusion and elements other than simplices.
+    \end{itemize}
+\end{frame}
+
+
+\section{Numerical experiments}
+\begin{frame}{Two families of SBP operators}
+    $\qquad\circ$: SBP nodes,$\qquad$ \tiny $\blacksquare$ \normalsize: face cubature points \\
+    \footnotesize
+    \begin{tabular}{p{0.1\textwidth}p{0.15\textwidth}p{0.15\textwidth}p{0.15\textwidth}p{0.15\textwidth}}
+        & \multicolumn{4}{c}{\textbf{degree}} \\\cline{2-5}
+        \textbf{family} & 
+        \multicolumn{1}{c}{$p=1$} & 
+        \multicolumn{1}{c}{$p=2$} & 
+        \multicolumn{1}{c}{$p=3$} & 
+        \multicolumn{1}{c}{$p=4$}  \rule{0ex}{3ex} \\\hline
+        \vspace*{-0.15\textwidth}\textbf{SBP}-$\bm{\Omega}$ &
+        %\parbox[t]{0.2\textwidth}{\rule{0ex}{0.16\textwidth}SBP-$\Omega$} & 
+        \parbox[b]{0.15\textwidth}{%
+            \begin{center}%
+                \includegraphics[width=0.16\textwidth]{figures/p1_Omega}\\
+                 3 nodes
+            \end{center}} &
+        \parbox[b]{0.15\textwidth}{%
+            \begin{center}%
+                \includegraphics[width=0.16\textwidth]{figures/p2_Omega}\\
+                6 nodes
+            \end{center}} &
+        \parbox[b]{0.15\textwidth}{%
+            \begin{center}%
+                \includegraphics[width=0.16\textwidth]{figures/p3_Omega}\\
+                10 nodes
+            \end{center}} &
+        \parbox[b]{0.15\textwidth}{%
+            \begin{center}%
+                \includegraphics[width=0.16\textwidth]{figures/p4_Omega}\\
+                15 nodes
+            \end{center}} \\\hline
+        \vspace*{-0.15\textwidth}\textbf{SBP}-$\bm{\Gamma}$ & 
+        \parbox[b]{0.15\textwidth}{%
+            \begin{center}%
+                \includegraphics[width=0.16\textwidth]{figures/p1_Gamma}\\
+                3 nodes
+            \end{center}} &
+        \parbox[b]{0.15\textwidth}{%
+            \begin{center}%
+                \includegraphics[width=0.16\textwidth]{figures/p2_Gamma}\\
+                7 nodes
+            \end{center}} &
+        \parbox[b]{0.15\textwidth}{%
+            \begin{center}%
+                \includegraphics[width=0.16\textwidth]{figures/p3_Gamma}\\
+                12 nodes
+            \end{center}} &
+        \parbox[b]{0.15\textwidth}{%
+            \begin{center}%
+                \includegraphics[width=0.16\textwidth]{figures/p4_Gamma}\\
+                18 nodes
+            \end{center}} \\\hline
+    \end{tabular}
+\end{frame}
+
+\subsection{Accuracy study}
+\begin{frame}{Accuracy study}
+    We use MMS to verity the convergence rates of the solution and functional. The manufactured solution is defined by
+    \begin{equation*}
+    \begin{aligned}
+    \Lambda &= \begin{bmatrix}
+    x^2+1 && xy \\ xy && y^2+1
+    \end{bmatrix}, \\
+    \fnc{U}(x,y) &= \sin(4\pi x)\sin(4\pi y)
+    \end{aligned}
+    \end{equation*}
+    and the functional is
+    \begin{equation*}
+    \fnc{J} = \int \fnc{U} \diff \Omega
+    \end{equation*}
+\end{frame}
+
+\begin{frame}{Accuracy study}
+    \vskip -4mm
+    \begin{figure}  
+        \centering
+        \begin{subfigure}[b]{0.425\linewidth}
+            \centering
+            \includegraphics[width=1.0\linewidth]{figures/p_accuracy.png}
+            \subcaption*{Error in solution}
+        \end{subfigure}%
+        \begin{subfigure}[b]{0.425\linewidth}
+            \centering
+            \includegraphics[width=1.0\linewidth]{figures/j_accuracy.png}
+            \subcaption*{Error in functional}
+        \end{subfigure}
+    \end{figure}
+\end{frame}
+
+\subsection{Tightness of stability bound}
+\begin{frame}{Tightness of stability bound}
+    Our stability conditions are sufficient but not necessary, and we want to know how tight they are. To this end, we introduce a relaxation factor 
+    $\alpha \in (0,1]$ acting on $\Sig^{(1)}$ and $\Sig^{\fnc{D}}$.
+    \begin{itemize}
+        \item overly conservative, $\alpha \ll 1$
+        \item necessary and sufficient, $\alpha \le 1$ 
+    \end{itemize}
+    \begin{figure} 
+        \begin{subfigure}{0.45\textwidth}
+            \centering
+            \includegraphics[width=1.0\linewidth]{figures/relaxation_eigMin_gamma.png}
+            \subcaption*{\footnotesize Largest eigenvalue using SBP-$\Gamma$}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+            \centering
+            \includegraphics[width=1.0\linewidth]{figures/relaxation_eigMin_omega.png}
+            \subcaption*{\footnotesize Largest eigenvalue using SBP-$\Omega$}
+        \end{subfigure} 
+    \end{figure}
+\end{frame}
+
+\subsection{Energy stability}
+
+\begin{frame}{Energy stability}
+    We solve an unsteady homogeneous problem on a nearly tangled mesh.
+    \vskip -2mm
+    \begin{figure} 
+        \centering
+        \includegraphics[width=0.45\linewidth]{figures/perturbed_mesh_16x16.png}
+        \caption*{\footnotesize Perturbed mesh, the largest angle = 179.90\textdegree}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Energy stability}
+    We solve an unsteady homogeneous problem on a nearly tangled mesh.
+    \vskip -2mm
+    \begin{figure} 
+        \centering
+        \includegraphics[width=0.65\linewidth]{figures/energy_stability.png}
+        \caption*{\footnotesize Energy history of homogeneous problem using BDF2}
+    \end{figure}
+\end{frame}
+
+\section*{}
+\begin{frame}{Conclusion}
+      We have
+      \begin{itemize}
+          \item presented a general discretization with dense penalty matrices;
+          \item carried out analysis of adjoint consistency and energy stability, and
+          determined conditions that guarantee a conservative, energy-stable,
+          primal-consistent, and adjoint-consistent discretization;
+          \item generalized BR2 and SIPG, with algebraic connection;
+          \item numerically verified the theory.
+      \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \Huge\centering
+    Thanks!
+\end{frame}
+
+\begin{frame}[allowframebreaks]{References}
+    \footnotesize
+    \bibliographystyle{plain}
+    \bibliography{references}
+\end{frame}
+
+
+\end{document}
