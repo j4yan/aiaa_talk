@@ -109,10 +109,11 @@
     Since the solution is "$C^{-1}$" continuous, simultaneous 
     approximation terms (SATs) are necessary to couple elements weakly, and 
     \begin{itemize}
+        \item are referred as interior penalties in the FE community
         \item stabilize the discretization the penalties should be \\ neither too large nor too small in magnitude\cite{Arnold2002}
         \item obtain adjoint consistency \\
         obtain adjoint consistency gives $O(h^{p+1})$ in $L^2$-norm for solution, and $O(h^{2p})$ for functionals\cite{hartmann:2007b}
-        \item are referred as interior penalties in the FE community.
+        
     \end{itemize}
     \vskip 5mm
     The purpose of this work is to address SATs for multidimensional SBP.
@@ -264,7 +265,7 @@ Our objective is to determine these matrices.
     \end{equation*}
 \end{frame}
 \begin{frame}{Functional and adjoint (2/3)}
-    Both the continuous adjoint equation and discrete adjoint equation can be found by $\frac{\partial L}{\partial \delta u} = 0$.
+    Both the continuous adjoint equation and discrete adjoint equation can be found by $\frac{\delta L}{\delta u} = 0$.
     \begin{itemize}
         \item Continous adjoint equation:
         \begin{equation*}
@@ -447,6 +448,28 @@ It is straightforward to show the above conditions also give a locally \textbf{c
 \end{frame}
 
 \section{Generalizations of BR2 and SIPG}
+\begin{frame}
+    The conditions we got
+    \begin{block}{}
+        \begin{equation*}
+        \begin{aligned}
+        \Siggk{1} &= \Siggn{1}, &\qquad  
+        \Siggk{2} + \Siggn{2} &= -\B_{\gamma}, \\
+        \Siggk{3} + \Siggn{3} &= \B_{\gamma}, &\qquad
+        \Siggk{4} &= \Siggn{4}.
+        \end{aligned}
+        \end{equation*}
+        \begin{gather*}
+        \Siggam{1} \succeq \Siggk{2} \Cgk
+        \left(\alpha_{\gamma\kappa}\Lam_{\kappa}^{*}\right)^{-1}\Cgk^T \Siggk{2}
+        + \Siggn{2} \Cgn \left(\alpha_{\gamma\nu} \Lam_{\nu}^{*}\right)^{-1}\Cgn^T \Siggn{2}, \\
+        \Sig_{\gamma}^{\fnc{D}} \succeq \Bg \Cgk
+        \left(\alpha_{\gamma\kappa}\Lam_{\kappa}^{*}\right)^{-1}\Cgk^T \Bg ,\\
+        \Sig_{\gamma}^{(4)} \succeq 0.
+        \end{gather*}
+    \end{block}
+    give a unified approach to define some popular schemes in FE methods. 
+\end{frame}
 \begin{frame}{Generalization of BR2 and SIPG (1/2)}
     A simple and effective choice is
     \footnotesize
@@ -455,48 +478,51 @@ It is straightforward to show the above conditions also give a locally \textbf{c
     \Siggk{4} = \Siggn{4} = 0,
     \end{equation*}
     \normalsize
-    This choice allows us to generalize BR2\cite{Bassi2005} and SIPG\cite{hartmann:2007b}:
+    This choice allows us to generalize BR2\cite{Bassi2005} and SIPG\cite{hartmann:2007b}. Other choices lead to asymmetric or one-sided schemes, such as LDG\cite{Arnold2002}.
+    \vskip 3mm
     \begin{itemize}
         \item SBP-BR2:
-        \footnotesize
+         \footnotesize
         \begin{gather*}
         \Siggam{1} = \frac{1}{4}\Bg \Cgk
         \left(\alpha_{\gamma\kappa}\Lam_{\kappa}^{*}\right)^{-1}\Cgk^T \Bg
         + \frac{1}{4}\Bg \Cgn \left(\alpha_{\gamma\nu} \Lam_{\nu}^{*}\right)^{-1}\Cgn^T \Bg \\
         \Sig_{\gamma}^{\fnc{D}} = \Bg \Cgk
-        \left(\alpha_{\gamma\kappa}\Lam_{\kappa}^{*}\right)^{-1}\Cgk^T \Bg \\
+        \left(\alpha_{\gamma\kappa}\Lam_{\kappa}^{*}\right)^{-1}\Cgk^T \Bg
         \end{gather*}
         \normalsize
-        \item SPB-SIPG
+        \item SPB-SIPG:
         \footnotesize
         \begin{equation*} 
         \Siggam{1} = \delta_{\gamma}^{(1)} \Bg,
         \qquad\text{and}\qquad
         \Sig_{\gamma}^{\fnc{D}} = \delta_{\gamma}^{\fnc{D}} \Bg,
-        \end{equation*}
-        \normalsize
-        where 
-        \footnotesize
-        \begin{align*}
-        \delta_{\gamma}^{(1)} &= \frac{(\lambda_{\max})_\kappa 
-            \| \Bg^{\frac{1}{2}} \Rgk \Hk^{-\frac{1}{2}} \|_{2}^{2}}%
-        {4 \alpha_{\gamma\kappa}} 
-        + \frac{(\lambda_{\max})_\nu 
-            \| \Bg^{\frac{1}{2}} \Rgn \H_{\nu}^{-\frac{1}{2}} \|_{2}^{2}}%
-        {4 \alpha_{\gamma\nu}}, \\ 
-        \delta_{\gamma}^\fnc{D} &= \frac{(\lambda_{\max})_\kappa 
-            \| \Bg^{\frac{1}{2}} \Rgk \Hk^{-\frac{1}{2}} \|_{2}^{2}}%
-        {\alpha_{\gamma\kappa}} .
-        \end{align*}
+        \end{equation*}   
     \end{itemize}
 \end{frame}
 
-\begin{frame}
+\begin{frame}{Generalization of BR2 and SIPG (2/2)}
+    where 
+    \footnotesize
+    \begin{align*}
+    \delta_{\gamma}^{(1)} &= \frac{(\lambda_{\max})_\kappa 
+        \| \Bg^{\frac{1}{2}} \Rgk \Hk^{-\frac{1}{2}} \|_{2}^{2}}%
+    {4 \alpha_{\gamma\kappa}} 
+    + \frac{(\lambda_{\max})_\nu 
+        \| \Bg^{\frac{1}{2}} \Rgn \H_{\nu}^{-\frac{1}{2}} \|_{2}^{2}}%
+    {4 \alpha_{\gamma\nu}}, \\ 
+    \delta_{\gamma}^\fnc{D} &= \frac{(\lambda_{\max})_\kappa 
+        \| \Bg^{\frac{1}{2}} \Rgk \Hk^{-\frac{1}{2}} \|_{2}^{2}}%
+    {\alpha_{\gamma\kappa}}.
+    \normalsize
+    \end{align*}
+    \normalsize
     \begin{itemize}
         \item To the best of our knowledge, this is the first time the SBP generalization of BR2 has been presented.
         \item Our analysis shows how SIPG is related to BR2 using straightforward matrix analysis.
         \item The SBP-SIPG penalty parameters are similar to those given by Shahbazi\cite{Shahbazi2005explicit}, but more general, because they are applicable to spatially varying tensor diffusion and elements other than simplices.
     \end{itemize}
+    
 \end{frame}
 
 
@@ -597,7 +623,7 @@ It is straightforward to show the above conditions also give a locally \textbf{c
     $\alpha \in (0,1]$ acting on $\Sig^{(1)}$ and $\Sig^{\fnc{D}}$.
     \begin{itemize}
         \item overly conservative, $\alpha \ll 1$
-        \item necessary and sufficient, $\alpha \le 1$ 
+        \item necessary and sufficient, $\alpha \ge 1$ 
     \end{itemize}
     \begin{figure} 
         \begin{subfigure}{0.45\textwidth}
